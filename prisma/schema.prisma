@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  //output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  username      String
+  password      String?
+  claimed       Boolean  @default(false)
+  displaySuffix String   @map("display_suffix")
+  createdAt     DateTime @default(now()) @map("created_at")
+  lastSeenAt    DateTime? @map("last_seen_at")
+
+  messages      Message[]
+  roles         UserRole[]
+  sessions      Session[]
+
+  @@unique([username, displaySuffix])
+  @@index([username])
+  @@map("users")
+}
+
+model Server {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  channels  Channel[]
+  roles     Role[]
+
+  @@map("servers")
+}
+
+model Channel {
+  id       String      @id @default(uuid())
+  serverId String      @map("server_id")
+  name     String
+  type     ChannelType
+
+  server   Server      @relation(fields: [serverId], references: [id])
+  messages Message[]
+
+  @@map("channels")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  serverId    String   @map("server_id")
+  name        String
+  permissions Int
+
+  server      Server   @relation(fields: [serverId], references: [id])
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
+
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  channelId String   @map("channel_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  editedAt  DateTime? @map("edited_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  files     File[]
+
+  @@map("messages")
+}
+
+model File {
+  id        String   @id @default(uuid())
+  messageId String   @map("message_id")
+  path      String
+  mimeType  String   @map("mime_type")
+  fileSize  Int      @map("file_size")
+
+  message   Message  @relation(fields: [messageId], references: [id])
+
+  @@map("files")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("sessions")
+}
+
+enum ChannelType {
+  text
+  voice
+}
