@@ -171,3 +171,8 @@ logs/
 # Cache
 .cache/
 .tmp/
+
+# Windows metadata
+*:Zone.Identifier
+$RECYCLE.BIN/
+Thumbs.db
