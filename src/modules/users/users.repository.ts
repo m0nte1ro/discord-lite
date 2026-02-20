@@ -1,11 +1,11 @@
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../shared/lib/prisma.js";
 
-export async function findClaimedUser(username: string) {
+export async function findGuestUser(username: string) {
   return prisma.user.findFirst({
     where: {
       username,
-      claimed: true
-    }
+      claimed: false,
+    },
   });
 }
 
@@ -14,7 +14,7 @@ export async function createGuestUser(username: string, displaySuffix: string) {
     data: {
       username,
       displaySuffix,
-      claimed: false
-    }
+      claimed: false,
+    },
   });
 }

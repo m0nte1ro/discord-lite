@@ -1,16 +1,19 @@
-import type { CreateUserInput, UserResponse } from "./users.types.js";
 import * as usersRepository from "./users.repository.js";
-import { generateSuffix } from "../../utils/generateSuffix.js";
-import { UsernameClaimedError, FailedToCreateUserError } from "./users.errors.js";
+import { FailedToCreateUserError } from "./users.errors.js";
+import type { CreateUserInput, UserResponse } from "./users.types.js";
+import { generateSuffix } from "../../shared/utils/generateSuffix.js";
+import { UsernameClaimedError } from "../../shared/errors/users.errors.js";
+import { findClaimedUser } from "../../application/queries/user.queries.js";
+import { createSession } from "../../application/use-cases/create-session.use-case.js";
 
 export async function createUser(
-  input: CreateUserInput
+  input: CreateUserInput,
 ): Promise<UserResponse> {
   const { username } = input;
 
   // Business rule:
   // If username is already claimed, do not allow new users
-  const usernameIsClaimed = await usersRepository.findClaimedUser(username);
+  const usernameIsClaimed = await findClaimedUser(username);
 
   if (usernameIsClaimed) {
     throw new UsernameClaimedError(username);
@@ -32,17 +35,19 @@ export async function createUser(
     }
 
     attempts++;
-    
+
     if (attempts > 5) {
       throw new FailedToCreateUserError();
     }
   }
+
+  createSession(user.id);
 
   return {
     id: user.id,
     username: user.username,
     displaySuffix: user.displaySuffix,
     createdAt: user.createdAt,
-    lastSeenAt: user.lastSeenAt
+    lastSeenAt: user.lastSeenAt,
   };
 }
