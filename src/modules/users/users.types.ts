@@ -9,3 +9,8 @@ export interface UserResponse {
   createdAt: Date;
   lastSeenAt: Date | null;
 }
+
+export interface ClaimUsernameInput {
+  userId: string;
+  password: string;
+}

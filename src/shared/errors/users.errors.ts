@@ -9,3 +9,9 @@ export class UsernameClaimedError extends AppError {
     );
   }
 }
+
+export class UserNotFound extends AppError {
+  constructor() {
+    super("Failed to fetch user data.", 500, "USER_NOT_FOUND");
+  }
+}

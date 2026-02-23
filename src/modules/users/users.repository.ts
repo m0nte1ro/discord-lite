@@ -18,3 +18,21 @@ export async function createGuestUser(username: string, displaySuffix: string) {
     },
   });
 }
+
+export function findUserByID(id: string) {
+  return prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+export function claimUsernameDB(id: string, password: string) {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      password: password,
+      claimed: true,
+    },
+  });
+}

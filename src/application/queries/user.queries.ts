@@ -8,11 +8,3 @@ export function findClaimedUser(username: string) {
     },
   });
 }
-
-export function findUserByID(id: string) {
-  return prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
-}

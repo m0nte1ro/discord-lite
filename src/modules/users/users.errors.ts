@@ -9,3 +9,13 @@ export class FailedToCreateUserError extends AppError {
     );
   }
 }
+
+export class WeakPassword extends AppError {
+  constructor() {
+    super(
+      "The given password doesn't meet the required standards.",
+      422,
+      "WEAK_PASSWORD",
+    );
+  }
+}
