@@ -18,5 +18,5 @@ export async function login(input: LoginInput): Promise<AuthResponse> {
     throw new WrongCredentials();
   }
 
-  return createSession(user.id);
+  return await createSession(user.id);
 }

@@ -8,6 +8,8 @@ export interface UserResponse {
   displaySuffix: string;
   createdAt: Date;
   lastSeenAt: Date | null;
+  token: string;
+  expiresAt: Date;
 }
 
 export interface ClaimUsernameInput {

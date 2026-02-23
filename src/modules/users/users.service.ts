@@ -49,7 +49,7 @@ export async function createUser(
     }
   }
 
-  createSession(user.id);
+  let session = await createSession(user.id);
 
   return {
     id: user.id,
@@ -57,6 +57,8 @@ export async function createUser(
     displaySuffix: user.displaySuffix,
     createdAt: user.createdAt,
     lastSeenAt: user.lastSeenAt,
+    token: session.token,
+    expiresAt: session.expiresAt,
   };
 }
 

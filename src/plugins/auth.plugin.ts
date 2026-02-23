@@ -1,4 +1,5 @@
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import fp from "fastify-plugin";
+import type { FastifyInstance } from "fastify";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "../shared/types/jwt.js";
 import { findValidSessionByToken } from "../shared/infra/session-store.js";
@@ -13,32 +14,28 @@ declare module "fastify" {
   }
 }
 
-export async function authPlugin(app: FastifyInstance) {
+async function authPlugin(app: FastifyInstance) {
   app.addHook("preHandler", async (request) => {
     const authHeader = request.headers.authorization;
 
-    if (!authHeader) {
-      return;
-    }
+    console.log("🔥 auth hook fired");
+
+    if (!authHeader) return;
 
     const [type, token] = authHeader.split(" ");
-
-    if (type !== "Bearer" || !token) {
-      return;
-    }
+    if (type !== "Bearer" || !token) return;
 
     try {
       const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-      const session = findValidSessionByToken(token);
-
-      if (!session) {
-        return;
-      }
+      const session = await findValidSessionByToken(token);
+      if (!session) return;
 
       request.user = { id: payload.sub };
     } catch {
-      // Invalid token, ignore and proceed without setting request.user
+      // ignore
     }
   });
 }
+
+export default fp(authPlugin);
