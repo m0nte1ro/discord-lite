@@ -147,10 +147,6 @@ yarn-error.log*
 dist/
 build/
 
-# Env
-.env
-.env.*
-
 # Prisma
 prisma/dev.db
 prisma/*.db
