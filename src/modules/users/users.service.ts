@@ -32,7 +32,7 @@ export async function createUser(
   let attempts = 0;
   while (!user) {
     try {
-      const suffix = generateSuffix();
+      let suffix = generateSuffix();
 
       user = await usersRepository.createGuestUser(username, suffix);
     } catch (err: any) {

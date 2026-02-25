@@ -40,6 +40,7 @@ model Server {
   channels  Channel[]
   roles     Role[]
 
+  @@unique([name])
   @@map("servers")
 }
 
